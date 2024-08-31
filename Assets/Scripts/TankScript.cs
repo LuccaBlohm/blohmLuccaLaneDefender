@@ -14,8 +14,11 @@ public class TankScript : MonoBehaviour
     [SerializeField] private float moveDirection;
     [SerializeField] private bool tankMoving;
 
+    private Vector2 enemy;
+
     [SerializeField] private GameObject bullet;
     [SerializeField] private GameObject explosion;
+    [SerializeField] private GameObject contactExplosion;
     [SerializeField] private GameObject bulletSpawner;
 
     public PlayerInput playerControls;
@@ -81,14 +84,20 @@ public class TankScript : MonoBehaviour
     {
         if (collision.gameObject.tag == "Slime")
         {
+            enemy = new Vector2(gameObject.transform.position.x + 0.8f, gameObject.transform.position.y);
+            Instantiate(contactExplosion, enemy, Quaternion.identity);
             scoreKeeper.Lives--;
         }
         else if (collision.gameObject.tag == "Snail")
         {
+            enemy = new Vector2(gameObject.transform.position.x + 1, gameObject.transform.position.y);
+            Instantiate(contactExplosion, enemy, Quaternion.identity);
             scoreKeeper.Lives--;
         }
         else if (collision.gameObject.tag == "Snake")
         {
+            enemy = new Vector2(gameObject.transform.position.x + 1, gameObject.transform.position.y);
+            Instantiate(contactExplosion, enemy, Quaternion.identity);
             scoreKeeper.Lives--;
         }
     }
@@ -106,12 +115,25 @@ public class TankScript : MonoBehaviour
 
     }
 
+    private void OnDestroy()
+    {
+        move.started -= Move_started;
+        move.canceled -= Move_canceled;
+        shoot.started -= Shoot_started;
+        shoot.canceled -= Shoot_canceled;
+    }
+
     // Update is called once per frame
     void Update()
     {
         if (tankMoving)
         {
             moveDirection = move.ReadValue<float>();
+        }
+
+        if (scoreKeeper.GameOver)
+        {
+            playerControls.currentActionMap.Disable();
         }
     }
 }

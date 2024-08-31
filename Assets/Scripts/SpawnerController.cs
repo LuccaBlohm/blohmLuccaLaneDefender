@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class SpawnerController : MonoBehaviour
 {
+    [SerializeField] private ScoreKeeper scoreKeeper;
+
     private float spawnTime = 5;
     private int lane;
     private Transform selectedLane;
@@ -27,6 +29,8 @@ public class SpawnerController : MonoBehaviour
     {
         StartCoroutine(SpawnTimer());
         StartCoroutine(TimerUpdate());
+
+        scoreKeeper = FindObjectOfType<ScoreKeeper>();
     }
 
     IEnumerator SpawnTimer()
@@ -95,6 +99,9 @@ public class SpawnerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (scoreKeeper.GameOver)
+        {
+            StopAllCoroutines();
+        }
     }
 }

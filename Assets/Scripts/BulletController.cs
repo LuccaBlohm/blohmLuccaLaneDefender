@@ -5,9 +5,18 @@ using UnityEngine.EventSystems;
 
 public class BulletController : MonoBehaviour
 {
+    [SerializeField] private ScoreKeeper scoreKeeper;
+
     [SerializeField] private GameObject explosion;
 
     private Vector2 offset;
+
+    private int speed = 10;
+
+    private void Start()
+    {
+        scoreKeeper = FindObjectOfType<ScoreKeeper>();
+    }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -19,6 +28,11 @@ public class BulletController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(10, 0);
+        gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(speed, 0);
+
+        if (scoreKeeper.GameOver)
+        {
+            speed = 0;
+        }
     }
 }

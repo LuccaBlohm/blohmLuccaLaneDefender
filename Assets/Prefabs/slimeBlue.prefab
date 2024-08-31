@@ -197,3 +197,4 @@ MonoBehaviour:
   health: 0
   shotSFX: {fileID: 8300000, guid: 81442cf543bc1ed46948fbc2e9cf093b, type: 3}
   dyingSFX: {fileID: 8300000, guid: 7ef0cb87f2b05904cb3d0aae38128579, type: 3}
+  hitSFX: {fileID: 8300000, guid: 0403dba184fa8be49b9a5231721e148d, type: 3}

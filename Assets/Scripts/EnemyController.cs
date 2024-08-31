@@ -6,7 +6,7 @@ using UnityEngine;
 public class EnemyController : MonoBehaviour
 {
     [SerializeField] private ScoreKeeper scoreKeeper;
-    [SerializeField] private Animator animator; 
+    Animator animator; 
 
     private int speed;
     private int savedSpeed;
@@ -41,7 +41,7 @@ public class EnemyController : MonoBehaviour
             health = 1;
         }
 
-        animator = FindObjectOfType<Animator>();
+        animator = gameObject.GetComponent<Animator>();
         scoreKeeper = FindObjectOfType<ScoreKeeper>();
     }
 
@@ -51,6 +51,7 @@ public class EnemyController : MonoBehaviour
         {
             AudioSource.PlayClipAtPoint(shotSFX, audioReceptor);
             gameObject.GetComponent<EnemyController>().health = health - 1;
+            StartCoroutine(HitAnimation());
             StartCoroutine(Stop());
             if (health <= 0) 
             {
@@ -72,6 +73,13 @@ public class EnemyController : MonoBehaviour
         }
     }
 
+    IEnumerator HitAnimation()
+    {
+        animator.SetBool("dying", true);
+        yield return new WaitForSeconds(0.2f);
+        animator.SetBool("dying", false);
+    }
+
     IEnumerator Stop()
     {
         if (hit == false)
@@ -88,5 +96,11 @@ public class EnemyController : MonoBehaviour
     void Update()
     {
         gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(speed, 0);
+
+        if (scoreKeeper.GameOver)
+        {
+            speed = 0;
+            gameObject.GetComponent<Animator>().enabled = false;
+        }
     }
 }
