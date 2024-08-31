@@ -1,10 +1,11 @@
 using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
+    /// <summary>
+    /// variables used throughout the script
+    /// </summary>
     [SerializeField] private ScoreKeeper scoreKeeper;
     Animator animator; 
 
@@ -19,7 +20,9 @@ public class EnemyController : MonoBehaviour
 
     private Vector3 audioReceptor = new Vector3(0, 0, -10);
 
-    // Start is called before the first frame update
+    /// <summary>
+    /// on start set each enemies stats and get their animator
+    /// </summary>
     void Start()
     {
         if (gameObject.CompareTag("Slime"))
@@ -45,6 +48,10 @@ public class EnemyController : MonoBehaviour
         scoreKeeper = FindObjectOfType<ScoreKeeper>();
     }
 
+    /// <summary>
+    /// when  the enemy collides with anything a different interation happens
+    /// </summary>
+    /// <param name="collision"></param>
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "Bullet")
@@ -73,6 +80,10 @@ public class EnemyController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// when an enemy is hit play the hit animation for a second
+    /// </summary>
+    /// <returns></returns>
     IEnumerator HitAnimation()
     {
         animator.SetBool("dying", true);
@@ -80,6 +91,10 @@ public class EnemyController : MonoBehaviour
         animator.SetBool("dying", false);
     }
 
+    /// <summary>
+    /// when an enemy is hit they stop for half a second
+    /// </summary>
+    /// <returns></returns>
     IEnumerator Stop()
     {
         if (hit == false)
@@ -92,7 +107,9 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
+    /// <summary>
+    /// every frame the enemy is moving except for when the game is over
+    /// </summary>
     void Update()
     {
         gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(speed, 0);

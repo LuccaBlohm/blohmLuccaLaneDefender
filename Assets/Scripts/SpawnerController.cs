@@ -1,9 +1,11 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SpawnerController : MonoBehaviour
 {
+    /// <summary>
+    /// variable thats will be used throughout the script
+    /// </summary>
     [SerializeField] private ScoreKeeper scoreKeeper;
 
     private float spawnTime = 5;
@@ -24,7 +26,9 @@ public class SpawnerController : MonoBehaviour
     [SerializeField] private Transform lane4;
     [SerializeField] private Transform lane5;
 
-    // Start is called before the first frame update
+    /// <summary>
+    /// on start set up both timers to loop
+    /// </summary>
     void Start()
     {
         StartCoroutine(SpawnTimer());
@@ -33,6 +37,10 @@ public class SpawnerController : MonoBehaviour
         scoreKeeper = FindObjectOfType<ScoreKeeper>();
     }
 
+    /// <summary>
+    /// after a certain amount of time an enemy spawn, repeat ad infinitum till end of game
+    /// </summary>
+    /// <returns></returns>
     IEnumerator SpawnTimer()
     {
         Selection();
@@ -41,6 +49,10 @@ public class SpawnerController : MonoBehaviour
         StartCoroutine(SpawnTimer());
     }
 
+    /// <summary>
+    /// every few seconds the time between enemy spawns gets shorter and shorter till it caps at 1 second
+    /// </summary>
+    /// <returns></returns>
     IEnumerator TimerUpdate()
     {
         yield return new WaitForSeconds(2);
@@ -51,6 +63,9 @@ public class SpawnerController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// randomly select an enemy and a lane to spawn that enemy
+    /// </summary>
     public void Selection()
     {
         enemyType = Random.Range(1, 6);
@@ -96,7 +111,9 @@ public class SpawnerController : MonoBehaviour
     }
 
 
-    // Update is called once per frame
+    /// <summary>
+    /// when the game is over stop all coroutines from looping
+    /// </summary>
     void Update()
     {
         if (scoreKeeper.GameOver)

@@ -1,13 +1,14 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using static UnityEngine.Rendering.VirtualTexturing.Debugging;
+using UnityEngine.SceneManagement;
 
 public class TankScript : MonoBehaviour
 {
+    /// <summary>
+    /// variables used throughout the script
+    /// </summary>
     [SerializeField] private ScoreKeeper scoreKeeper;
 
     [SerializeField] private float speed = 7;
@@ -24,12 +25,15 @@ public class TankScript : MonoBehaviour
     public PlayerInput playerControls;
     private InputAction move;
     private InputAction shoot;
+    private InputAction restart;
 
     [SerializeField] private AudioClip shootingSFX;
 
     private Vector3 audioReceptor = new Vector3(0, 0, -10);
 
-    // Start is called before the first frame update
+    /// <summary>
+    /// on start set the controls
+    /// </summary>
     void Start()
     {
         playerControls.currentActionMap.Enable();
@@ -39,31 +43,68 @@ public class TankScript : MonoBehaviour
         shoot = playerControls.currentActionMap.FindAction("Shoot");
         shoot.started += Shoot_started;
         shoot.canceled += Shoot_canceled;
+        restart = playerControls.currentActionMap.FindAction("Restart");
+        restart.started += Restart_started;
+        restart.canceled += Restart_canceled;
 
         scoreKeeper = FindObjectOfType<ScoreKeeper>();
     }
 
+    private void Restart_canceled(InputAction.CallbackContext context)
+    {
+        //nothing happens when you lift up on restart
+    }
+
+    /// <summary>
+    /// when restart button is clicked reload the scene
+    /// </summary>
+    /// <param name="context"></param>
+    private void Restart_started(InputAction.CallbackContext context)
+    {
+        SceneManager.LoadScene(1);
+    }
+
+    /// <summary>
+    /// stop shooting when button isnt clicked/held
+    /// </summary>
+    /// <param name="context"></param>
     private void Shoot_canceled(InputAction.CallbackContext context)
     {
         StopAllCoroutines();
         explosion.SetActive(false);
     }
 
+    /// <summary>
+    /// shoot when button is clicked/held
+    /// </summary>
+    /// <param name="context"></param>
     private void Shoot_started(InputAction.CallbackContext context)
     {
         StartCoroutine(SpawnBullets());
     }
-
+    
+    /// <summary>
+    /// stop moving when button isnt clicked/held
+    /// </summary>
+    /// <param name="context"></param>
     private void Move_canceled(InputAction.CallbackContext context)
     {
         tankMoving = false;
     }
 
+    /// <summary>
+    /// move when buttons are clicked/held
+    /// </summary>
+    /// <param name="context"></param>
     private void Move_started(InputAction.CallbackContext context)
     {
         tankMoving = true;
     }
 
+    /// <summary>
+    /// spawn a bullet in front of the tank when shoot is clicked
+    /// </summary>
+    /// <returns></returns>
     IEnumerator SpawnBullets()
     {
         Instantiate(bullet, bulletSpawner.transform.position, Quaternion.identity);
@@ -73,6 +114,10 @@ public class TankScript : MonoBehaviour
         StartCoroutine(SpawnBullets());
     }
 
+    /// <summary>
+    /// spawn a explosion to hide the spawning bullet
+    /// </summary>
+    /// <returns></returns>
     IEnumerator BulletExplosion()
     {
         explosion.SetActive(true);
@@ -80,6 +125,10 @@ public class TankScript : MonoBehaviour
         explosion.SetActive(false);
     }
 
+    /// <summary>
+    /// when an enemy hits the tank spawn an explosion on the enemy, destroy the enemy, and lose a life
+    /// </summary>
+    /// <param name="collision"></param>
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "Slime")
@@ -102,6 +151,9 @@ public class TankScript : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// set up the speed whenever movement is clicked
+    /// </summary>
     private void FixedUpdate()
     {
         if (tankMoving)
@@ -115,15 +167,22 @@ public class TankScript : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// stop all controls on destroy to prevent errors
+    /// </summary>
     private void OnDestroy()
     {
         move.started -= Move_started;
         move.canceled -= Move_canceled;
         shoot.started -= Shoot_started;
         shoot.canceled -= Shoot_canceled;
+        restart.started -= Restart_started;
+        restart.canceled -= Restart_canceled;
     }
 
-    // Update is called once per frame
+    /// <summary>
+    /// every frame check if tank is moving and if games over end all controls
+    /// </summary>
     void Update()
     {
         if (tankMoving)
@@ -133,7 +192,10 @@ public class TankScript : MonoBehaviour
 
         if (scoreKeeper.GameOver)
         {
-            playerControls.currentActionMap.Disable();
+            move.started -= Move_started;
+            move.canceled -= Move_canceled;
+            shoot.started -= Shoot_started;
+            shoot.canceled -= Shoot_canceled;
         }
     }
 }
